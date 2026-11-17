@@ -29,38 +29,27 @@ app.get("/zombies/purged", async (req, res) => {
       const id = parseInt(tx.tokenId);
       const imageUrl = `https://data.zombieapepes.com/${id}.png`;
       return {
-        tokenId: id,
         id: id,
+        tokenId: id,
+        title: `Zombie Apepe #${id}`,
         name: `Zombie Apepe #${id}`,
+        thumbnail: imageUrl,
         image: imageUrl,
-        imageUrl: imageUrl,
-        imageURI: imageUrl,
-        img: imageUrl,
-        metadata: {
-          image: imageUrl,
-          name: `Zombie Apepe #${id}`,
-        },
-        transactionHash: tx.hash,
-        txHash: tx.hash,
         hash: tx.hash,
+        transactionHash: tx.hash,
         tx: tx.hash,
-        transaction: tx.hash,
         blockNumber: parseInt(tx.blockNum, 16),
       };
     });
 
     const unique = Array.from(
-      new Map(purged.map((item) => [item.tokenId, item])).values()
+      new Map(purged.map((item) => [item.id, item])).values()
     );
     unique.sort((a, b) => b.blockNumber - a.blockNumber);
 
     res.json({
       purgedZombies: unique,
-      zombies: unique,
-      data: unique,
-      items: unique,
-      results: unique,
-      purged: unique,
+      purgedZombiesTotalCount: unique.length,
     });
   } catch (err) {
     console.error("Error fetching purged zombies:", err);
