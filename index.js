@@ -46,7 +46,15 @@ app.get("/zombies/purged", async (req, res) => {
     const unique = Array.from(new Map(purged.map((item) => [item.tokenId, item])).values());
     unique.sort((a, b) => b.blockNumber - a.blockNumber);
 
-    res.json(unique);
+    // Return as an object (this is what the page expects)
+    res.json({
+      purgedZombies: unique,
+      zombies: unique,
+      data: unique,
+      items: unique,
+      results: unique,
+      purged: unique,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to fetch purged zombies" });
