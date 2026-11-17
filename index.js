@@ -36,6 +36,10 @@ app.get("/zombies/purged", async (req, res) => {
         imageUrl: imageUrl,
         imageURI: imageUrl,
         img: imageUrl,
+        metadata: {
+          image: imageUrl,
+          name: `Zombie Apepe #${id}`,
+        },
         transactionHash: tx.hash,
         txHash: tx.hash,
         hash: tx.hash,
@@ -45,7 +49,6 @@ app.get("/zombies/purged", async (req, res) => {
       };
     });
 
-    // Remove duplicates and sort newest first
     const unique = Array.from(
       new Map(purged.map((item) => [item.tokenId, item])).values()
     );
