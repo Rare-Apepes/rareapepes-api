@@ -6,10 +6,11 @@ app.use(cors());
 
 app.get("/zombies/purged", (req, res) => {
   res.json({
-    success: true,
-    data: [],
+    purgedZombies: [],
     zombies: [],
-    purged: []
+    data: [],
+    items: [],
+    results: []
   });
 });
 
