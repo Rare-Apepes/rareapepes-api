@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { Alchemy, Network, Utils } = require("alchemy-sdk");
+const { Alchemy, Network } = require("alchemy-sdk");
 
 const app = express();
 app.use(cors());
@@ -27,13 +27,15 @@ app.get("/zombies/purged", async (req, res) => {
 
     const purged = transfers.transfers.map((tx) => {
       const id = parseInt(tx.tokenId);
+      const imageUrl = `https://data.zombieapepes.com/${id}.png`;
       return {
         tokenId: id,
         id: id,
         name: `Zombie Apepe #${id}`,
-        image: `https://data.zombieapepes.com/${id}.png`,
-        imageUrl: `https://data.zombieapepes.com/${id}.png`,
-        img: `https://data.zombieapepes.com/${id}.png`,
+        image: imageUrl,
+        imageUrl: imageUrl,
+        imageURI: imageUrl,
+        img: imageUrl,
         transactionHash: tx.hash,
         txHash: tx.hash,
         hash: tx.hash,
@@ -43,10 +45,12 @@ app.get("/zombies/purged", async (req, res) => {
       };
     });
 
-    const unique = Array.from(new Map(purged.map((item) => [item.tokenId, item])).values());
+    // Remove duplicates and sort newest first
+    const unique = Array.from(
+      new Map(purged.map((item) => [item.tokenId, item])).values()
+    );
     unique.sort((a, b) => b.blockNumber - a.blockNumber);
 
-    // Return as an object (this is what the page expects)
     res.json({
       purgedZombies: unique,
       zombies: unique,
@@ -56,7 +60,7 @@ app.get("/zombies/purged", async (req, res) => {
       purged: unique,
     });
   } catch (err) {
-    console.error(err);
+    console.error("Error fetching purged zombies:", err);
     res.status(500).json({ error: "Failed to fetch purged zombies" });
   }
 });
