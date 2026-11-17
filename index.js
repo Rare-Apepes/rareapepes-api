@@ -16,16 +16,27 @@ const DEAD_ADDRESS = "0x000000000000000000000000000000000000dEaD";
 
 app.get("/zombies/purged", async (req, res) => {
   try {
-    const transfers = await alchemy.core.getAssetTransfers({
-      fromBlock: "0x0",
-      toBlock: "latest",
-      contractAddresses: [ZOMBIE_CONTRACT],
-      toAddress: DEAD_ADDRESS,
-      category: ["erc721"],
-      excludeZeroValue: false,
-    });
+    let allTransfers = [];
+    let pageKey = undefined;
 
-    const purged = transfers.transfers.map((tx) => {
+    // Keep fetching until there are no more pages
+    do {
+      const response = await alchemy.core.getAssetTransfers({
+        fromBlock: "0x0",
+        toBlock: "latest",
+        contractAddresses: [ZOMBIE_CONTRACT],
+        toAddress: DEAD_ADDRESS,
+        category: ["erc721"],
+        excludeZeroValue: false,
+        maxCount: 1000,
+        pageKey: pageKey,
+      });
+
+      allTransfers = allTransfers.concat(response.transfers);
+      pageKey = response.pageKey;
+    } while (pageKey);
+
+    const purged = allTransfers.map((tx) => {
       const id = parseInt(tx.tokenId);
       const imageUrl = `https://data.zombieapepes.com/${id}.png`;
       return {
@@ -42,6 +53,7 @@ app.get("/zombies/purged", async (req, res) => {
       };
     });
 
+    // Remove duplicates
     const unique = Array.from(
       new Map(purged.map((item) => [item.id, item])).values()
     );
