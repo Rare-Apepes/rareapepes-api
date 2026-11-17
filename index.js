@@ -5,7 +5,12 @@ const app = express();
 app.use(cors());
 
 app.get("/zombies/purged", (req, res) => {
-  res.json([]);
+  res.json({
+    success: true,
+    data: [],
+    zombies: [],
+    purged: []
+  });
 });
 
 app.get("/", (req, res) => {
